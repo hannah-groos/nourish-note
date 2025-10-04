@@ -1,5 +1,8 @@
 // app/chat/page.tsx
+
 "use client";
+
+import MoodEntry from "@/components/MoodEntry";
 
 import { useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
@@ -29,21 +32,26 @@ export default function ChatPage() {
   }, []);
 
   const listRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+
   useEffect(() => {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight });
   }, [msgs]);
 
-  async function send() {
-    const text = input.trim();
-    if (!text || !threadId) return;
+  // Helper: send an arbitrary string (used by both the button and hotkey)
+  async function sendText(text: string) {
+    const message = text.trim();
+    if (!message || !threadId) return;
+
     setInput("");
-    setMsgs((m) => [...m, { role: "user", content: text }]);
+    setMsgs((m) => [...m, { role: "user", content: message }]);
     setLoading(true);
+
     try {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ threadId, message: text }),
+        body: JSON.stringify({ threadId, message }),
       });
 
       // Guard against HTML error pages (avoids Unexpected token '<')
@@ -66,11 +74,23 @@ export default function ChatPage() {
     }
   }
 
+  async function send() {
+    await sendText(input);
+  }
+
   function onKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
     if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
       e.preventDefault();
       void send();
     }
+  }
+
+  // Called by MoodEntry when a suggestion is clicked.
+  // Prefills the input and focuses it (so users can edit before sending).
+  function startFromPrompt(text: string) {
+    setInput(text);
+    // Focus after state update flush
+    setTimeout(() => inputRef.current?.focus(), 0);
   }
 
   return (
@@ -79,6 +99,25 @@ export default function ChatPage() {
 
       <div style={{ marginBottom: 8, color: "#666", fontSize: 12 }}>
         thread: {mounted && threadId ? `${threadId.slice(0, 8)}…` : "—"}
+      </div>
+
+      {/* Mood-based entry (conversation starters) */}
+      <div
+        style={{
+          marginBottom: 12,
+          border: "1px solid #eee",
+          borderRadius: 12,
+          padding: 12,
+          background: "#fafafa",
+        }}
+      >
+        <MoodEntry
+          onStartConversation={startFromPrompt}
+          onSelectEmotion={(id) => {
+            // optional: analytics hook
+            // posthog.capture("mood_selected", { id })
+          }}
+        />
       </div>
 
       <div
@@ -94,7 +133,9 @@ export default function ChatPage() {
         }}
       >
         {msgs.length === 0 && (
-          <div style={{ color: "#888" }}>Say hi to start…</div>
+          <div style={{ color: "#888" }}>
+            Pick a mood above or say hi to start…
+          </div>
         )}
         {msgs.map((m, i) => (
           <div
@@ -123,11 +164,18 @@ export default function ChatPage() {
 
       <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
         <textarea
+          ref={inputRef}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={onKeyDown}
           placeholder="Type a message… (Cmd/Ctrl+Enter to send)"
-          style={{ flex: 1, height: 96, padding: 8, borderRadius: 6, border: "1px solid #ddd" }}
+          style={{
+            flex: 1,
+            height: 96,
+            padding: 8,
+            borderRadius: 6,
+            border: "1px solid #ddd",
+          }}
           disabled={!threadId || loading}
         />
         <button
@@ -155,7 +203,14 @@ export default function ChatPage() {
             setThreadId(newId);
             setMsgs([]);
           }}
-          style={{ fontSize: 12, color: "#555", textDecoration: "underline", background: "none", border: "none", cursor: "pointer" }}
+          style={{
+            fontSize: 12,
+            color: "#555",
+            textDecoration: "underline",
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+          }}
         >
           Reset conversation
         </button>
