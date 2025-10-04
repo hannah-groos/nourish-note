@@ -34,10 +34,10 @@ export default function Home() {
       {/* hero */}
       <section className="text-center z-10">
         <div className="flex flex-col items-center">
-          <h1 className="text-7xl sm:text-8xl md:text-9xl font-black tracking-tighter mb-8 font-sans">NourishNote</h1>
+          <h1 className="text-5xl sm:text-6xl md:text-7xl font-black tracking-tighter mb-8 font-sans">NourishNote</h1>
           <div className="h-12 flex items-center">
-            <p className="text-2xl sm:text-3xl md:text-4xl text-[var(--teal-600)] dark:text-[var(--teal-300)] overflow-hidden whitespace-nowrap border-r-4 border-r-[var(--teal-500)] animate-typing">
-              Built to inspire for mindful living.
+            <p className="text-lg sm:text-xl md:text-2xl text-[var(--teal-600)] dark:text-[var(--teal-300)] overflow-hidden whitespace-nowrap border-r-4 border-r-[var(--teal-500)] animate-typing">
+              From mindless eating to mindful living.
             </p>
           </div>
           <p className="max-w-3xl mx-auto text-xl sm:text-2xl text-[color:rgb(19_78_74_/_0.8)] dark:text-[color:rgb(240_253_250_/_0.8)] mt-12 mb-16">
@@ -61,3 +61,4 @@ export default function Home() {
     </main>
   );
 }
+
