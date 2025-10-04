@@ -1,4 +1,4 @@
-import { Checkbox } from "../ui/checkbox";
+import { Checkbox } from "../supa_components/checkbox";
 
 export function TutorialStep({
   title,
