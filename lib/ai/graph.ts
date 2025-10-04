@@ -99,10 +99,20 @@ export async function invokeChat(threadId: string, text: string) {
     If a user mentions severe distress or signs of an eating disorder, respond with empathy and recommend professional or crisis support (e.g., NEDA, Beat, or local health services).`;
 
   const config = { configurable: { thread_id: threadId } } as const;
-  const input = { messages: [
-    {role: "system", content: systemPrompt},
-    { role: "user", content: text }
-  ] };
+  
+  // Check if this thread already has messages
+  const currentState = await app.getState(config);
+  const existingMessages = currentState.values?.messages || [];
+  
+  // Only add system message if this is a new conversation
+  const messages = existingMessages.length === 0 
+    ? [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: text }
+      ]
+    : [{ role: "user", content: text }];
+  
+  const input = { messages };
   const out = await app.invoke(input, config);
   const last = out.messages[out.messages.length - 1];
   return String(last?.content ?? "");
