@@ -1,12 +1,8 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
-import Link from "next/link";
-import { ThemeSwitcher } from "@/components/theme-switcher";
-import TimezoneSelector from "@/components/ui/timezone-selector";
-import { LogoutButton } from "@/components/logout-button";
 import "./globals.css";
-import Navbar from "@/components/NavBar";
+
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -37,9 +33,6 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {/* Header: Brand + Timezone (left), Theme + Logout (right) */}
-          
-          <Navbar />
           {children}
         </ThemeProvider>
       </body>

@@ -68,7 +68,7 @@ export default async function JournalAliaPage() {
   // This avoids bringing in a heavy tz lib. We reconstruct Date from the formatted string.
   const [y, m, d] = todayStr.split("-").map(Number);
   // Interpret as UTC midnight to progress in whole-day steps independent of local offset
-  let cursor = new Date(Date.UTC(y, (m ?? 1) - 1, d ?? 1));
+  const cursor = new Date(Date.UTC(y, (m ?? 1) - 1, d ?? 1));
   let current_streak = 0;
   if (!uniqueDays.has(todayStr)) {
     cursor.setUTCDate(cursor.getUTCDate() - 1);
@@ -128,7 +128,6 @@ export default async function JournalAliaPage() {
 
   return (
     <JournalInterface
-      userId={user.id}
       userEmail={userEmail}
       entriesRemaining={entriesRemaining}
       streakData={streakData}
