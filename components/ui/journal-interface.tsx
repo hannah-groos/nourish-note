@@ -30,7 +30,10 @@ export default function JournalInterface({ userId, userEmail, entriesRemaining, 
     const [error, setError] = useState<string | null>(null)
     const [success, setSuccess] = useState(false)
     const textareaRef = useRef<HTMLTextAreaElement>(null)
+    const hideSuccessTimerRef = useRef<number | null>(null)
     const router = useRouter()
+
+    // Success message persists until dismissed by user
 
     const wordCount = content.trim().split(/\s+/).filter(Boolean).length
     const isOverLimit = wordCount > 400
@@ -42,15 +45,16 @@ export default function JournalInterface({ userId, userEmail, entriesRemaining, 
             interval = setInterval(() => {
                 setTimeLeft((time) => time - 1)
             }, 1000)
-        } else if (timeLeft === 0 && !hasExtended) {
-            // Timer ended, offer extension
-            setIsActive(false)
+        } else if (timeLeft <= 0) {
+            // Hard stop: clamp and freeze
+            if (timeLeft !== 0) setTimeLeft(0)
+            if (isActive) setIsActive(false)
         }
 
         return () => {
             if (interval) clearInterval(interval)
         }
-    }, [isActive, timeLeft, hasExtended])
+    }, [isActive, timeLeft])
 
     const startTimer = () => {
         setIsActive(true)
@@ -84,19 +88,22 @@ export default function JournalInterface({ userId, userEmail, entriesRemaining, 
         setIsSubmitting(true)
         setError(null)
 
-        const supabase = createClient()
         const totalTime = hasExtended ? 90 : 60
         const timeSpent = totalTime - timeLeft
 
         try {
-            const { error: insertError } = await supabase.from("journal_entries").insert({
-                user_id: userId,
-                content: content.trim(),
-                word_count: wordCount,
-                duration_seconds: timeSpent,
+            // Send raw content to our API which calls actions/entries.ts -> insertEntry
+            const res = await fetch("/api/entries", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ rawJournalText: content.trim() }),
             })
 
-            if (insertError) throw insertError
+            const json = await res.json()
+            if (!res.ok || json?.error) {
+                setError(typeof json?.error === "string" ? json.error : "Failed to save entry")
+                throw new Error(typeof json?.error === "string" ? json.error : "Failed to save entry")
+            }
 
             setSuccess(true)
             setContent("")
@@ -104,11 +111,8 @@ export default function JournalInterface({ userId, userEmail, entriesRemaining, 
             setIsActive(false)
             setHasExtended(false)
 
-            // Refresh to update entries remaining
-            setTimeout(() => {
-                router.refresh()
-                setSuccess(false)
-            }, 2000)
+            // Optional: refresh later if needed; removed to avoid flicker
+            // router.refresh()
         } catch (err) {
             setError(err instanceof Error ? err.message : "Failed to save entry")
         } finally {
@@ -127,6 +131,11 @@ export default function JournalInterface({ userId, userEmail, entriesRemaining, 
         const secs = seconds % 60
         return `${mins}:${secs.toString().padStart(2, "0")}`
     }
+
+    // When full 90s cycle is complete (60s + 30s extension), freeze editor
+    const isFrozen = !isActive && timeLeft === 0 && hasExtended
+
+    const canEdit = isActive && timeLeft > 0
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-teal-50 via-white to-amber-50">
@@ -240,10 +249,24 @@ export default function JournalInterface({ userId, userEmail, entriesRemaining, 
                                 <Textarea
                                     ref={textareaRef}
                                     value={content}
-                                    onChange={(e) => setContent(e.target.value)}
+                                    onChange={(e) => {
+                                        if (!canEdit) return
+                                        setContent(e.target.value)
+                                    }}
+                                    readOnly={!canEdit}
+                                    disabled={!canEdit}
                                     placeholder="Write freely about your thoughts and feelings..."
-                                    className="min-h-[300px] resize-none border-teal-200 focus:border-teal-400"
+                                    className={`min-h-[300px] resize-none border-teal-200 focus:border-teal-400 ${!canEdit ? "opacity-80 cursor-not-allowed pointer-events-none" : ""}`}
                                 />
+                                <div className="flex justify-end">
+                                    <Button
+                                        onClick={handleSubmit}
+                                        className="bg-teal-600 hover:bg-teal-700"
+                                        disabled={isSubmitting || isOverLimit || wordCount === 0}
+                                    >
+                                        {isSubmitting ? "Saving..." : "Submit now"}
+                                    </Button>
+                                </div>
                             </div>
                         )}
 
@@ -262,23 +285,31 @@ export default function JournalInterface({ userId, userEmail, entriesRemaining, 
                             </div>
                         )}
 
-                        {/* Extended Timer Ended */}
-                        {!isActive && timeLeft === 0 && hasExtended && !success && (
-                            <div className="text-center py-8">
-                                <p className="text-teal-900 font-semibold mb-4">Time to wrap up your thoughts.</p>
-                                <Button
-                                    onClick={handleSubmit}
-                                    className="bg-teal-600 hover:bg-teal-700"
-                                    disabled={isSubmitting || isOverLimit}
-                                >
-                                    {isSubmitting ? "Saving..." : "Submit Entry"}
-                                </Button>
+                        {/* Extended Timer Ended (freeze editor) */}
+                        {isFrozen && !success && (
+                            <div className="space-y-4 text-center py-8">
+                                <p className="text-teal-900 font-semibold">Time to wrap up your thoughts.</p>
+                                <Textarea
+                                    value={content}
+                                    readOnly
+                                    placeholder="Your final entry"
+                                    className="min-h-[300px] resize-none border-teal-200 bg-teal-50/60 text-teal-900 opacity-80 cursor-not-allowed"
+                                />
+                                <div className="flex justify-center">
+                                    <Button
+                                        onClick={handleSubmit}
+                                        className="bg-teal-600 hover:bg-teal-700"
+                                        disabled={isSubmitting || isOverLimit}
+                                    >
+                                        {isSubmitting ? "Saving..." : "Submit Entry"}
+                                    </Button>
+                                </div>
                             </div>
                         )}
 
                         {/* Success Message */}
                         {success && (
-                            <div className="text-center py-8">
+                            <div className="text-center py-8 space-y-3">
                                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-teal-100 mb-4">
                                     <svg className="w-8 h-8 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -286,6 +317,15 @@ export default function JournalInterface({ userId, userEmail, entriesRemaining, 
                                 </div>
                                 <p className="text-teal-900 font-semibold">Entry saved successfully!</p>
                                 <p className="text-sm text-teal-600 mt-2">Great job taking time for yourself today.</p>
+                                <div className="pt-2">
+                                    <Button
+                                        onClick={() => setSuccess(false)}
+                                        variant="outline"
+                                        className="border-teal-200 text-teal-700 hover:bg-teal-50"
+                                    >
+                                        Dismiss
+                                    </Button>
+                                </div>
                             </div>
                         )}
 

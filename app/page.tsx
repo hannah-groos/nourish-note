@@ -34,6 +34,11 @@ export default function Home() {
       {/* hero */}
       <section className="text-center z-10">
         <div className="flex flex-col items-center">
+          <img
+            src="/images/branding/mmlogo.png"
+            alt="NourishNote logo"
+            className="block -mb-20 h-48 sm:h-64 md:h-80 w-auto"
+          />
           <h1 className="text-5xl sm:text-6xl md:text-7xl font-black tracking-tighter mb-8 font-sans">NourishNote</h1>
           <div className="h-12 flex items-center">
             <p className="text-lg sm:text-xl md:text-2xl text-[var(--teal-600)] dark:text-[var(--teal-300)] overflow-hidden whitespace-nowrap border-r-4 border-r-[var(--teal-500)] animate-typing">
