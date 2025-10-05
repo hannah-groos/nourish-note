@@ -254,7 +254,7 @@ function SuggestionRow({
           className="inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-medium hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
           aria-label="Use this prompt"
         >
-          <span>Discuss with Flourish</span>
+          <span>Discuss with Alia</span>
         </button>
       </div>
     </div>

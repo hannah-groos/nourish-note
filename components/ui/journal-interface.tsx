@@ -36,7 +36,7 @@ export default function JournalInterface({ userId, userEmail, entriesRemaining, 
     const isOverLimit = wordCount > 400
 
     useEffect(() => {
-        let interval: number | null = null
+        let interval: ReturnType<typeof setInterval> | null = null
 
         if (isActive && timeLeft > 0) {
             interval = setInterval(() => {
