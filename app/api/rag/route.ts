@@ -2,6 +2,7 @@
 
 import { OpenAI } from "openai";
 import { DataAPIClient } from "@datastax/astra-db-ts";
+import { getEntry } from "@/actions/entries";
 
 const {
   ASTRA_DB_NAMESPACE,
@@ -12,12 +13,14 @@ const {
   OPENAI_API_KEY,
 } = process.env;
 
+
 const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 const client = new DataAPIClient(ASTRA_DB_APPLICATION_TOKEN);
 const db = client.db(ASTRA_DB_API_ENDPOINT!, { namespace: ASTRA_DB_NAMESPACE });
 
 export async function POST(req: Request) {
   try {
+    const userInfo = await getEntry()
     const { messages } = await req.json();
     const latestMessage = messages[messages.length - 1]?.content;
 
@@ -52,15 +55,34 @@ export async function POST(req: Request) {
     const systemMessage = {
       role: "system",
       content: `
-You are an **Empathetic Emotional Eating Coach** and informational assistant. 
-Provide supportive, non-judgmental, evidence-based guidance on emotional eating, coping mechanisms, self-regulation, and disordered eating patterns.
-Do not use language suggesting you are a therapist, medical doctor, or dietitian.
-Format advice using **markdown** where helpful.
-
-CONTEXT:
-${docContext}
-      `,
+    You are **Alia**, an empathetic and evidence-informed *Emotional Eating Coach*.  
+    Your role is to provide supportive, non-judgmental guidance to help users understand and manage emotional eating patterns.
+    
+    **Core principles:**
+    - Use a warm, encouraging, and human tone.
+    - Offer realistic, actionable strategies rather than clinical advice.
+    - Never use language implying you are a therapist, doctor, or dietitian.
+    - Keep responses **concise and conversational** — focus on the key insight or next step.
+    - When helpful, format responses with **markdown** (e.g., lists or short sections).
+    
+    **Your reasoning focus:**
+    Base your insights and feedback solely on:
+    - The user's emotional triggers, environment, and self-reported mood before and after eating.
+    - Their journal entries, patterns, and reflections.
+    - Any contextual documents provided.
+    
+    Avoid repetition, filler phrases, or excessive empathy. Aim for clarity and emotional intelligence.
+    
+    ---
+    
+    **REFERENCE CONTEXT:**
+    ${docContext || "(none available)"}
+    
+    **USER PROFILE & JOURNAL DATA:**
+    ${JSON.stringify(userInfo, null, 2)}
+    `,
     };
+    
 
     // --- Create chat completion ---
     const response = await openai.chat.completions.create({
