@@ -21,9 +21,10 @@ export async function POST(req: NextRequest) {
       status: 200,
       headers: { "content-type": "application/json" },
     });
-  } catch (e: any) {
+  } catch (e: unknown) {
     console.error("API /chat error:", e);
-    return new Response(JSON.stringify({ error: e?.message ?? "Unknown error" }), {
+    const msg = e instanceof Error ? e.message : String(e);
+    return new Response(JSON.stringify({ error: msg ?? "Unknown error" }), {
       status: 500,
       headers: { "content-type": "application/json" },
     });

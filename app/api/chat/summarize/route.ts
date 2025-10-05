@@ -19,7 +19,8 @@ export async function POST(req: NextRequest) {
     // await db.upsertSummary({ threadId, summary });
 
     return NextResponse.json({ ok: true, summary }, { status: 200 });
-  } catch (e: any) {
-    return NextResponse.json({ ok: false, error: e?.message ?? "unknown" }, { status: 500 });
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return NextResponse.json({ ok: false, error: msg ?? "unknown" }, { status: 500 });
   }
 }
