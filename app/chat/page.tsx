@@ -281,55 +281,7 @@ export default function ChatPage() {
       <div className="container mx-auto px-4 py-4 sm:py-6 lg:py-8 max-w-7xl">
 
         <div className="flex flex-col lg:flex-row gap-4 sm:gap-6">
-          <aside className="w-full lg:w-80 xl:w-96 rounded-2xl bg-white border-2 border-teal-100 p-4 sm:p-6 shadow-xl shadow-teal-100/50 max-h-[400px] lg:max-h-[calc(100vh-12rem)] overflow-y-auto order-2 lg:order-1">
-            <div className="mb-6 flex items-center justify-between">
-              <h2 className="text-lg font-bold text-teal-900">Conversations</h2>
-              <button
-                onClick={() => {
-                  if (!mounted) return;
-                  localStorage.removeItem("chat.threadId");
-                  const newId = uuidv4();
-                  localStorage.setItem("chat.threadId", newId);
-                  setThreadId(newId);
-                  setMsgs([]);
-                }}
-                className="px-4 py-2 text-xs font-semibold text-white bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 rounded-lg transition-all shadow-md hover:shadow-lg"
-              >
-                + New Chat
-              </button>
-            </div>
-
-            <ul className="space-y-3">
-              <li className="cursor-pointer rounded-xl px-4 py-4 hover:bg-gradient-to-r hover:from-teal-50 hover:to-teal-100/50 transition-all border-2 border-transparent hover:border-teal-200 hover:shadow-md group">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-bold text-teal-900 group-hover:text-teal-700">
-                    Daily check-in
-                  </span>
-                  <span className="text-xs text-teal-500 bg-teal-50 px-2 py-1 rounded-full">
-                    2h ago
-                  </span>
-                </div>
-                <p className="text-xs text-teal-600 truncate">
-                  Feeling better today
-                </p>
-              </li>
-              <li className="cursor-pointer rounded-xl px-4 py-4 hover:bg-gradient-to-r hover:from-teal-50 hover:to-teal-100/50 transition-all border-2 border-transparent hover:border-teal-200 hover:shadow-md group">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-bold text-teal-900 group-hover:text-teal-700">
-                    Food journal review
-                  </span>
-                  <span className="text-xs text-teal-500 bg-teal-50 px-2 py-1 rounded-full">
-                    1d ago
-                  </span>
-                </div>
-                <p className="text-xs text-teal-600 truncate">
-                  I ate out and felt guilty
-                </p>
-              </li>
-            </ul>
-          </aside>
-
-          <section className="flex-1 font-sans order-1 lg:order-2">
+          <section className="flex-1 font-sans">
             {!showMoodBox && (
               <div className="mb-4 flex justify-end">
                 <button
