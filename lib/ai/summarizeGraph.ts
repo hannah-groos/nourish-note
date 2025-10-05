@@ -8,10 +8,9 @@ type Msg = { role: 'user' | 'assistant' | 'system'; content: string };
 
 /**
  * Summarize a thread of messages using the langgraph `app` (Gemini).
- * Returns either a parsed JSON object when the model emits JSON, or
- * a `{ raw: string }` fallback containing the raw assistant text.
+ * Returns a plain text summary string.
  */
-export async function summarizeThread(threadId: string, messages: Msg[]) {
+export async function summarizeThread(threadId: string, messages: Msg[]): Promise<string | null> {
   if (!threadId) throw new Error("threadId required");
   if (!Array.isArray(messages) || messages.length === 0) return null;
 
@@ -21,7 +20,7 @@ export async function summarizeThread(threadId: string, messages: Msg[]) {
     .join("\n");
 
   const systemMessage = { role: "system", content: SUMMARIZE_SYSTEM_PROMPT };
-  const userMessage = { role: "user", content: `CONVERSATION:\n${transcript}\n\nProduce a JSON summary according to the system instruction.` };
+  const userMessage = { role: "user", content: `CONVERSATION:\n${transcript}\n\nPlease provide a structured summary following the format specified in the system instruction.` };
 
   // Use a dedicated thread id for summarization so it doesn't inherit/chat with the main conversation
   const summaryThreadId = `${threadId}-summary-${randomUUID()}`;
@@ -37,12 +36,6 @@ export async function summarizeThread(threadId: string, messages: Msg[]) {
 
   if (!text) return null;
 
-  // Try to parse JSON if the model returned structured output
-  try {
-    const parsed = JSON.parse(String(text));
-    return parsed;
-  } catch {
-    // Fallback: return raw text
-    return { raw: String(text) };
-  }
+  // Add header to the summary
+  return `AI summary of user conversation with Alia\n\n${String(text)}`;
 }

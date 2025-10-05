@@ -74,40 +74,16 @@ export default function SavedConversation({ threadId }: { threadId?: string }) {
       }
 
       const s = data?.summary ?? null;
-      let formatted: string | null = null;
-
-      // If API returned a top-level field with a different name, fall back to raw
-      if (!s && data && typeof data === 'object') {
-        // show whole response object as fallback for debugging
-        formatted = JSON.stringify(data, null, 2);
-      } else if (s && typeof s === 'object') {
-        // Try common keys used by summarizeConversation
-        const parts: string[] = [];
-        const obj = s as Record<string, unknown>;
-        const userGoal = obj['user_goal'];
-        if (userGoal) parts.push(`Goal: ${String(userGoal)}`);
-
-        const keyPoints = obj['key_points'];
-        if (Array.isArray(keyPoints) && keyPoints.length) parts.push(`Key points:\n- ${(keyPoints as string[]).join('\n- ')}`);
-
-        const patterns = obj['patterns'];
-        if (Array.isArray(patterns) && patterns.length) parts.push(`Patterns:\n- ${(patterns as string[]).join('\n- ')}`);
-
-        const nextSteps = obj['suggested_next_steps'];
-        if (Array.isArray(nextSteps) && nextSteps.length) parts.push(`Next steps:\n- ${(nextSteps as string[]).join('\n- ')}`);
-
-        if (parts.length) {
-          formatted = parts.join('\n\n');
-        } else {
-          formatted = JSON.stringify(s, null, 2);
-        }
-      } else if (s && typeof s === 'string') {
-        formatted = s;
-      } else if (s && typeof s === 'object' && 'raw' in (s as Record<string, unknown>)) {
-        formatted = String((s as Record<string, unknown>)['raw']);
+      
+      // The summary should now be a plain string
+      if (s && typeof s === 'string') {
+        setSummary(s);
+      } else if (!s && data && typeof data === 'object') {
+        // Fallback: show whole response object for debugging
+        setSummary(`Debug - API response: ${JSON.stringify(data, null, 2)}`);
+      } else {
+        setSummary('No summary produced.');
       }
-
-      setSummary(formatted ?? 'No summary produced.');
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
       console.error('fetchSummary error', e);

@@ -4,23 +4,6 @@ import { SUMMARIZE_SYSTEM_PROMPT } from "./prompts/summarizePrompt";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY! });
 
-// (Optional) a JSON schema that mirrors the fields requested by the system prompt
-const summarySchema = {
-  type: "object",
-  properties: {
-    goal: { type: "string" },
-    current_state: { type: "string" },
-    triggers_contexts: { type: "array", items: { type: "string" } },
-    coping_attempts: { type: "array", items: { type: "string" } },
-    emotions: { type: "array", items: { type: "string" } },
-    patterns: { type: "array", items: { type: "string" } },
-    growth_edge: { type: "array", items: { type: "string" } },
-    next_steps: { type: "array", items: { type: "string" } },
-    metadata: { type: "array", items: { type: "string" } }
-  },
-  required: ["goal"]
-} as const;
-
 type Msg = { id: string; role: "user" | "assistant" | "system"; content: string };
 
 // Simple truncation: take last N turns so we stay within token limits
@@ -36,7 +19,7 @@ function toTranscript(messages: Msg[]) {
     .join("\n");
 }
 
-export async function summarizeConversation(messages: Msg[]) {
+export async function summarizeConversation(messages: Msg[]): Promise<string | null> {
   const recent = selectRecent(messages);
   if (recent.length === 0) return null;
 
@@ -45,13 +28,11 @@ export async function summarizeConversation(messages: Msg[]) {
   const res = await ai.models.generateContent({
     model: "gemini-2.0-flash", // or "gemini-1.5-pro" for higher quality
     contents: [
-      { role: "user", parts: [{ text: `CONVERSATION:\n${transcript}\n\nProduce a JSON summary that captures conversation.` }] }
+      { role: "user", parts: [{ text: `CONVERSATION:\n${transcript}\n\nPlease provide a structured summary following the format specified in the system instruction.` }] }
     ],
     config: {
       systemInstruction: SUMMARIZE_SYSTEM_PROMPT,
       temperature: 0.2,
-      responseMimeType: "application/json",
-      responseSchema: summarySchema,
     },
   });
 
@@ -79,21 +60,6 @@ export async function summarizeConversation(messages: Msg[]) {
 
   if (!maybeText) return null;
 
-  try {
-    return JSON.parse(maybeText as string);
-  } catch {
-    // Fallback if model returned non-JSON for any reason - shape aligned with prompt
-    return {
-      goal: "",
-      current_state: "",
-      triggers_contexts: [],
-      coping_attempts: [],
-      emotions: [],
-      patterns: [],
-      growth_edge: [],
-      next_steps: [],
-      metadata: [],
-      raw: maybeText,
-    };
-  }
+  // Add header to the summary
+  return `AI summary of user conversation with Alia\n\n${maybeText}`;
 }
