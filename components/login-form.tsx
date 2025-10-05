@@ -51,8 +51,8 @@ export function LoginForm({
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">Login</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-2xl text-teal-900 dark:text-teal-50">Login</CardTitle>
+          <CardDescription className="text-teal-700 dark:text-teal-200">
             Enter your email below to login to your account
           </CardDescription>
         </CardHeader>
@@ -60,7 +60,7 @@ export function LoginForm({
           <form onSubmit={handleLogin}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email" className="text-teal-900 dark:text-teal-50">Email</Label>
                 <Input
                   id="email"
                   type="email"
@@ -68,14 +68,15 @@ export function LoginForm({
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  className="bg-teal-50 dark:bg-teal-900 border border-teal-200 dark:border-teal-800 placeholder-teal-600 dark:placeholder-teal-300 text-teal-900 dark:text-teal-50 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
                 />
               </div>
               <div className="grid gap-2">
                 <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
+                  <Label htmlFor="password" className="text-teal-900 dark:text-teal-50">Password</Label>
                   <Link
                     href="/auth/forgot-password"
-                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
+                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline text-teal-700 hover:text-teal-900 dark:text-teal-300 dark:hover:text-teal-200"
                   >
                     Forgot your password?
                   </Link>
@@ -86,10 +87,15 @@ export function LoginForm({
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  className="bg-teal-50 dark:bg-teal-900 border border-teal-200 dark:border-teal-800 placeholder-teal-600 dark:placeholder-teal-300 text-teal-900 dark:text-teal-50 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
                 />
               </div>
               {error && <p className="text-sm text-red-500">{error}</p>}
-              <Button type="submit" className="w-full" disabled={isLoading}>
+              <Button
+                type="submit"
+                className="w-full bg-teal-500 hover:bg-teal-600 text-white"
+                disabled={isLoading}
+              >
                 {isLoading ? "Logging in..." : "Login"}
               </Button>
             </div>
@@ -97,7 +103,7 @@ export function LoginForm({
               Don&apos;t have an account?{" "}
               <Link
                 href="/auth/sign-up"
-                className="underline underline-offset-4"
+                className="underline underline-offset-4 text-teal-700 hover:text-teal-900 dark:text-teal-300 dark:hover:text-teal-200"
               >
                 Sign up
               </Link>

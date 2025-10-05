@@ -1,0 +1,9 @@
+import Image from "next/image";
+
+<Image
+  src="/images/branding/logo.png"
+  alt="NourishNote logo"
+  width={128}
+  height={128}
+  priority
+/>

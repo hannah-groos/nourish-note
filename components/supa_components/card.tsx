@@ -68,7 +68,7 @@ const CardFooter = React.forwardRef<
   <div
     ref={ref}
     className={cn("flex items-center p-6 pt-0", className)}
-    {...props}
+    {...props} //data that passes through to the component; take data from props and pass it to the div; date and time recorded am/pm
   />
 ));
 CardFooter.displayName = "CardFooter";
