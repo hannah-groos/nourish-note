@@ -81,7 +81,8 @@ export default function ChatPage() {
     }
 
     function onKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
-        if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+        // Send on Enter (unless Shift is held for a newline). Keep Ctrl/Cmd+Enter working too.
+        if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
             void send();
         }
@@ -203,7 +204,7 @@ export default function ChatPage() {
                                 value={input}
                                 onChange={(e) => setInput(e.target.value)}
                                 onKeyDown={onKeyDown}
-                                placeholder="Type a message… (Cmd/Ctrl+Enter to send)"
+                                placeholder="Type a message… (Enter to send, Shift+Enter for newline)"
                                 className="flex-1 h-24 p-3 rounded-md border border-gray-200 resize-none"
                                 disabled={!threadId || loading}
                             />
@@ -229,6 +230,13 @@ export default function ChatPage() {
                                 className="text-xs text-gray-600 underline bg-transparent border-0 p-0"
                             >
                                 Reset conversation
+                            </button>
+                            {/* End conversation button (no handler yet) */}
+                            <button
+                                className="ml-4 inline-flex items-center justify-center px-3 py-1 rounded-md text-xs font-medium text-white bg-teal-700 hover:bg-teal-800 shadow-sm transition"
+                                aria-label="Save conversation"
+                            >
+                                Save conversation
                             </button>
                             <div className="text-xs text-gray-500 mt-1">thread: {mounted && threadId ? `${threadId.slice(0, 8)}…` : '—'}</div>
                         </div>
