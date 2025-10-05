@@ -4,17 +4,21 @@ import { SUMMARIZE_SYSTEM_PROMPT } from "./prompts/summarizePrompt";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY! });
 
-// (Optional) a tiny JSON schema for consistent output
+// (Optional) a JSON schema that mirrors the fields requested by the system prompt
 const summarySchema = {
   type: "object",
   properties: {
-    user_goal: { type: "string" },
-    key_points: { type: "array", items: { type: "string" } },
-    patterns:   { type: "array", items: { type: "string" } },
-    suggested_next_steps: { type: "array", items: { type: "string" } },
-    safety_flags: { type: "array", items: { type: "string" } }
+    goal: { type: "string" },
+    current_state: { type: "string" },
+    triggers_contexts: { type: "array", items: { type: "string" } },
+    coping_attempts: { type: "array", items: { type: "string" } },
+    emotions: { type: "array", items: { type: "string" } },
+    patterns: { type: "array", items: { type: "string" } },
+    growth_edge: { type: "array", items: { type: "string" } },
+    next_steps: { type: "array", items: { type: "string" } },
+    metadata: { type: "array", items: { type: "string" } }
   },
-  required: ["user_goal", "key_points", "patterns", "suggested_next_steps"]
+  required: ["goal"]
 } as const;
 
 type Msg = { id: string; role: "user" | "assistant" | "system"; content: string };
@@ -41,7 +45,7 @@ export async function summarizeConversation(messages: Msg[]) {
   const res = await ai.models.generateContent({
     model: "gemini-2.0-flash", // or "gemini-1.5-pro" for higher quality
     contents: [
-      { role: "user", parts: [{ text: `CONVERSATION:\n${transcript}\n\nProduce a JSON summary.` }] }
+      { role: "user", parts: [{ text: `CONVERSATION:\n${transcript}\n\nProduce a JSON summary that captures conversation.` }] }
     ],
     config: {
       systemInstruction: SUMMARIZE_SYSTEM_PROMPT,
@@ -78,7 +82,18 @@ export async function summarizeConversation(messages: Msg[]) {
   try {
     return JSON.parse(maybeText as string);
   } catch {
-    // Fallback if model returned non-JSON for any reason
-    return { user_goal: "", key_points: [], patterns: [], suggested_next_steps: [], raw: maybeText };
+    // Fallback if model returned non-JSON for any reason - shape aligned with prompt
+    return {
+      goal: "",
+      current_state: "",
+      triggers_contexts: [],
+      coping_attempts: [],
+      emotions: [],
+      patterns: [],
+      growth_edge: [],
+      next_steps: [],
+      metadata: [],
+      raw: maybeText,
+    };
   }
 }
