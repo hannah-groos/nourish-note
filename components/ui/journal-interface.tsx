@@ -157,45 +157,51 @@ export default function JournalInterface({ userId, userEmail, entriesRemaining, 
             </header>
 
             <div className="container mx-auto px-4 py-8 max-w-4xl">
-                {/* Stats Bar */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                    <Card className="border-teal-100">
+                {/* Stats Bar (match /entries gradients) */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    {/* Current Streak */}
+                    <Card className="border-0 bg-gradient-to-br from-teal-500 to-teal-600 text-white shadow-xl shadow-teal-200/50">
                         <CardContent className="pt-6">
-                            <div className="flex items-center gap-3">
-                                <div className="p-2 bg-teal-100 rounded-lg">
-                                    <Flame className="h-5 w-5 text-teal-700" />
+                            <div className="flex items-center gap-4">
+                                <div className="p-3 bg-white/20 backdrop-blur-sm rounded-2xl">
+                                    <Flame className="h-7 w-7 text-white" />
                                 </div>
                                 <div>
-                                    <p className="text-sm text-teal-600">Current Streak</p>
-                                    <p className="text-2xl font-bold text-teal-900">{streakData?.current_streak || 0} days</p>
+                                    <p className="text-sm text-teal-50 font-medium">Current Streak</p>
+                                    <p className="text-4xl font-bold">{streakData?.current_streak || 0}</p>
+                                    <p className="text-xs text-teal-100">days in a row</p>
                                 </div>
                             </div>
                         </CardContent>
                     </Card>
 
-                    <Card className="border-amber-100">
+                    {/* Longest Streak */}
+                    <Card className="border-0 bg-gradient-to-br from-amber-500 to-amber-600 text-white shadow-xl shadow-amber-200/50">
                         <CardContent className="pt-6">
-                            <div className="flex items-center gap-3">
-                                <div className="p-2 bg-amber-100 rounded-lg">
-                                    <BookOpen className="h-5 w-5 text-amber-700" />
+                            <div className="flex items-center gap-4">
+                                <div className="p-3 bg-white/20 backdrop-blur-sm rounded-2xl">
+                                    <BookOpen className="h-7 w-7 text-white" />
                                 </div>
                                 <div>
-                                    <p className="text-sm text-amber-600">Total Entries</p>
-                                    <p className="text-2xl font-bold text-amber-900">{streakData?.total_entries || 0}</p>
+                                    <p className="text-sm text-amber-50 font-medium">Longest Streak</p>
+                                    <p className="text-4xl font-bold">{streakData?.longest_streak || 0}</p>
+                                    <p className="text-xs text-amber-100">days achieved</p>
                                 </div>
                             </div>
                         </CardContent>
                     </Card>
 
-                    <Card className="border-teal-100">
+                    {/* Total Entries */}
+                    <Card className="border-0 bg-gradient-to-br from-teal-600 to-teal-700 text-white shadow-xl shadow-teal-200/50">
                         <CardContent className="pt-6">
-                            <div className="flex items-center gap-3">
-                                <div className="p-2 bg-teal-100 rounded-lg">
-                                    <Clock className="h-5 w-5 text-teal-700" />
+                            <div className="flex items-center gap-4">
+                                <div className="p-3 bg-white/20 backdrop-blur-sm rounded-2xl">
+                                    <Clock className="h-7 w-7 text-white" />
                                 </div>
                                 <div>
-                                    <p className="text-sm text-teal-600">Entries Today</p>
-                                    <p className="text-2xl font-bold text-teal-900">{2 - entriesRemaining} / 2</p>
+                                    <p className="text-sm text-teal-50 font-medium">Total Entries</p>
+                                    <p className="text-4xl font-bold">{streakData?.total_entries || 0}</p>
+                                    <p className="text-xs text-teal-100">reflections</p>
                                 </div>
                             </div>
                         </CardContent>
@@ -370,7 +376,7 @@ export default function JournalInterface({ userId, userEmail, entriesRemaining, 
                         </Link>
                     </Button>
                     <Button asChild variant="outline" className="border-teal-200 text-teal-700 hover:bg-teal-50 bg-transparent">
-                        <Link href="/dashboard">
+                        <Link href="/entries">
                             <BookOpen className="h-4 w-4 mr-2" />
                             View Past Entries
                         </Link>
