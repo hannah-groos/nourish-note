@@ -28,7 +28,7 @@ export async function summarizeConversation(messages: Msg[]): Promise<string | n
   const res = await ai.models.generateContent({
     model: "gemini-2.0-flash", // or "gemini-1.5-pro" for higher quality
     contents: [
-      { role: "user", parts: [{ text: `CONVERSATION:\n${transcript}\n\nPlease provide a structured summary following the format specified in the system instruction.` }] }
+      { role: "user", parts: [{ text: `CONVERSATION:\n${transcript}\n\nPlease provide a structured summary following the format specified in the system instruction. Make it in a format readable by a user. Do not use ** to delineate.` }] }
     ],
     config: {
       systemInstruction: SUMMARIZE_SYSTEM_PROMPT,
