@@ -120,9 +120,19 @@ export default function ChatPage() {
                             <aside className="col-span-1 rounded-lg bg-white border border-teal-100 p-4 shadow-sm max-h-[70vh] overflow-y-auto">
                         <div className="mb-4 flex items-center justify-between">
                             <h2 className="text-sm font-semibold text-teal-800">Conversations</h2>
-                            <Link href="/chat/new" className="text-xs text-teal-600 hover:underline">
+                            <button
+                                onClick={() => {
+                                    if (!mounted) return;
+                                    localStorage.removeItem("chat.threadId");
+                                    const newId = uuidv4();
+                                    localStorage.setItem("chat.threadId", newId);
+                                    setThreadId(newId);
+                                    setMsgs([]);
+                                }}
+                                className="text-xs text-teal-600 hover:underline bg-transparent border-0 p-0"
+                            >
                                 New
-                            </Link>
+                            </button>
                         </div>
 
                         <ul className="space-y-2">
