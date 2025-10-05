@@ -9,7 +9,7 @@ export default function ChatModal() {
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  async function sendMessage(e?: any) {
+  async function sendMessage(e?: React.FormEvent) {
     if (e) e.preventDefault();
     if (!input.trim() || loading) return;
 

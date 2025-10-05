@@ -16,7 +16,7 @@ export default function Page() {
           <div className="text-center mb-6">
             <h2 className="text-3xl font-bold">Forgot Password?</h2>
             <p className="mt-3 text-[color:rgb(19_78_74_/_0.8)] dark:text-[color:rgb(240_253_250_/_0.8)]">
-              No worries, we'll send you reset instructions.
+              No worries, we&apos;ll send you reset instructions.
             </p>
           </div>
 

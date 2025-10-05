@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/supa_components/button"
 import { Card, CardContent, CardHeader } from "@/components/supa_components/card"
-import { ArrowLeft, Calendar, Clock, Flame, BookOpen, Trash2, UserCircle, Sparkles, Menu } from "lucide-react"
+import { Calendar, Clock, Flame, BookOpen, Trash2, UserCircle, Sparkles, Menu } from "lucide-react"
 
 interface Entry {
     id: string

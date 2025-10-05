@@ -85,6 +85,9 @@ export default function MoodEntry({ onStartConversation, onSelectEmotion, classN
   const [selectedMood, setSelectedMood] = useState<string | null>(null)
   const [showPrompts, setShowPrompts] = useState(false)
 
+  // Prevent unused variable warning
+  console.log("MoodEntry component loaded");
+
   const handleMoodClick = (mood: (typeof moods)[0]) => {
     setSelectedMood(mood.label)
     onSelectEmotion(mood.label)
@@ -92,7 +95,6 @@ export default function MoodEntry({ onStartConversation, onSelectEmotion, classN
   }
 
   const handlePromptClick = (prompt: string) => {
-    const moodData = moodPrompts[selectedMood as keyof typeof moodPrompts]
     const fullPrompt = `${prompt}\n\n`
     onStartConversation(fullPrompt)
     setShowPrompts(false)

@@ -11,7 +11,6 @@ export default async function PastEntriesPage() {
   if (!user) redirect("/auth/login");
 
   const userEmail = user.email ?? "";
-  const userId = user.id;
 
   // Fetch user's entries
   const { data: rows, error } = await supabase
@@ -22,23 +21,23 @@ export default async function PastEntriesPage() {
   if (error) console.error("Failed to load entries:", error);
 
   const entries = (rows ?? []).map((r) => {
-    const raw = (r as any).raw_data as string | null;
-    const extracted = (r as any).extracted_data as any | null;
+    const raw = (r as { raw_data: string | null }).raw_data;
+    const extracted = (r as { extracted_data: Record<string, unknown> | null }).extracted_data;
     const moodCandidate = extracted?.mood ?? extracted?.emotion ?? extracted?.feel ?? extracted?.sentiment ?? extracted?.top_emotion ?? extracted?.topEmotion ?? null;
     const mood = typeof moodCandidate === "string" ? moodCandidate : null;
     return {
-      id: (r as any).id as string,
+      id: (r as { id: string }).id,
       content: raw ?? "",
       word_count: (raw ?? "").trim().split(/\s+/).filter(Boolean).length,
       mood,
-      created_at: (r as any).created_at as string,
+      created_at: (r as { created_at: string }).created_at,
     };
   });
 
   // Build streakData (reuse logic similar to journal_alia)
   const createdAts: string[] = entries.map((e) => e.created_at);
 
-  const dayStrTZ = (d: Date, tz: string) =>
+  const dayStrTZ = (d: Date) =>
     new Intl.DateTimeFormat("en-CA", {
       timeZone: "UTC",
       year: "numeric",
@@ -49,20 +48,20 @@ export default async function PastEntriesPage() {
   const uniqueDays = new Set<string>();
   for (const ts of createdAts) {
     const d = new Date(ts);
-    uniqueDays.add(dayStrTZ(d, "UTC"));
+    uniqueDays.add(dayStrTZ(d));
   }
 
   const total_entries = createdAts.length;
   const now = new Date();
-  const todayStr = dayStrTZ(now, "UTC");
+  const todayStr = dayStrTZ(now);
   const [y, m, d] = todayStr.split("-").map(Number);
-  let cursor = new Date(Date.UTC(y, (m ?? 1) - 1, d ?? 1));
+  const cursor = new Date(Date.UTC(y, (m ?? 1) - 1, d ?? 1));
   let current_streak = 0;
   if (!uniqueDays.has(todayStr)) {
     cursor.setUTCDate(cursor.getUTCDate() - 1);
   }
   while (true) {
-    const key = dayStrTZ(cursor, "UTC");
+    const key = dayStrTZ(cursor);
     if (!uniqueDays.has(key)) break;
     current_streak += 1;
     cursor.setUTCDate(cursor.getUTCDate() - 1);
@@ -94,12 +93,11 @@ export default async function PastEntriesPage() {
   const streakData = { current_streak, longest_streak, total_entries } as const;
 
   // Fetch initial chat messages (empty for now, but could be extended)
-  const initialMessages: unknown[] = [];
+  const initialMessages: Array<{ id: string; role: "user" | "assistant"; content: string; created_at: string }> = [];
 
   return (
     <EntriesChatSplit 
       userEmail={userEmail}
-      userId={userId}
       entries={entries}
       streakData={streakData}
       initialMessages={initialMessages}

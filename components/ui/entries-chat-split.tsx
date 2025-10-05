@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/supa_components/button"
 import { Card, CardContent, CardHeader } from "@/components/supa_components/card"
 import { Textarea } from "@/components/ui/textarea"
-import { ArrowLeft, Calendar, Clock, Flame, BookOpen, Trash2, UserCircle, Sparkles, Menu, Send, MessageCircle } from "lucide-react"
+import { Calendar, Clock, Flame, BookOpen, Trash2, UserCircle, Sparkles, Menu, Send, MessageCircle } from "lucide-react"
 
 interface Entry {
     id: string
@@ -26,7 +26,6 @@ interface Message {
 
 interface EntriesChatSplitProps {
     userEmail: string
-    userId: string
     entries: Entry[]
     streakData: {
         current_streak: number
@@ -36,7 +35,7 @@ interface EntriesChatSplitProps {
     initialMessages: Message[]
 }
 
-export default function EntriesChatSplit({ userEmail, userId, entries, streakData, initialMessages }: EntriesChatSplitProps) {
+export default function EntriesChatSplit({ userEmail, entries, streakData, initialMessages }: EntriesChatSplitProps) {
     const [localEntries, setLocalEntries] = useState(entries)
     const [deletingId, setDeletingId] = useState<string | null>(null)
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -126,7 +125,7 @@ export default function EntriesChatSplit({ userEmail, userId, entries, streakDat
             const errorMessage: Message = {
                 id: crypto.randomUUID(),
                 role: "assistant",
-                content: "I'm sorry, I'm having trouble responding right now. Please try again in a moment.",
+                content: "I&apos;m sorry, I&apos;m having trouble responding right now. Please try again in a moment.",
                 created_at: new Date().toISOString(),
             }
             setMessages((prev) => [...prev, errorMessage])
@@ -427,9 +426,9 @@ export default function EntriesChatSplit({ userEmail, userId, entries, streakDat
                                         <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-purple-100 mb-4">
                                             <Sparkles className="h-8 w-8 text-purple-600" />
                                         </div>
-                                        <p className="text-teal-900 font-semibold mb-2">Hi, I'm Alia</p>
+                                        <p className="text-teal-900 font-semibold mb-2">Hi, I&apos;m Alia</p>
                                         <p className="text-sm text-teal-600 max-w-md mx-auto">
-                                            I've read your journal entries and I'm here to provide personalized support and insights. 
+                                            I&apos;ve read your journal entries and I&apos;m here to provide personalized support and insights. 
                                             What would you like to talk about?
                                         </p>
                                     </div>

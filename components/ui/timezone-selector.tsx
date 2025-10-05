@@ -53,10 +53,8 @@ export default function TimezoneSelector() {
         }
         // After mount, attempt to upgrade to the full Intl-supported time zone list (client-only)
         // This preserves identical initial SSR/CSR markup, preventing hydration mismatch.
-        // @ts-ignore stage-3 API in modern browsers
         const supported = typeof Intl !== "undefined" && typeof Intl.supportedValuesOf === "function"
-          ? // @ts-ignore
-            (Intl.supportedValuesOf("timeZone") as string[])
+          ? (Intl.supportedValuesOf("timeZone") as string[])
           : null;
         if (supported && supported.length > 0) {
           setTimezones(supported);

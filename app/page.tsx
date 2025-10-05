@@ -34,6 +34,7 @@ export default function Home() {
       {/* hero */}
       <section className="text-center z-10">
         <div className="flex flex-col items-center">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/images/branding/mmlogo.png"
             alt="NourishNote logo"

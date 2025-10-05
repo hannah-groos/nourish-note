@@ -9,7 +9,6 @@ const {
   ASTRA_DB_COLLECTION,
   ASTRA_DB_API_ENDPOINT,
   ASTRA_DB_APPLICATION_TOKEN,
-  GEMINI_KEY,
   OPENAI_API_KEY,
 } = process.env;
 
@@ -45,7 +44,7 @@ export async function POST(req: Request) {
         limit: 5
       })
       const docs = await cursor.toArray();
-      docContext = docs.map((d: any) => d.content).join("\n");
+      docContext = docs.map((d) => (d as { content?: string }).content || "").join("\n");
     } catch (err) {
       console.error("Astra DB query error:", err);
       docContext = "";
