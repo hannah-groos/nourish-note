@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import conversationStore from '@/lib/conversation';
+import { insertEntry } from '@/actions/entries';
 
 type Msg = { role: 'user' | 'assistant'; content: string };
 
@@ -78,6 +79,7 @@ export default function SavedConversation({ threadId }: { threadId?: string }) {
       // The summary should now be a plain string
       if (s && typeof s === 'string') {
         setSummary(s);
+        insertEntry(s);
       } else if (!s && data && typeof data === 'object') {
         // Fallback: show whole response object for debugging
         setSummary(`Debug - API response: ${JSON.stringify(data, null, 2)}`);
