@@ -35,6 +35,7 @@ export default function JournalInterface({
 }: JournalInterfaceProps) {
   const [content, setContent] = useState("");
   const [timeLeft, setTimeLeft] = useState(60);
+  const [lastSubmitted, setLastSubmitted] = useState("");
   const [isActive, setIsActive] = useState(false);
   const [hasExtended, setHasExtended] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -43,6 +44,13 @@ export default function JournalInterface({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const router = useRouter();
+  // NEW: helpers to attach the journal text to chat prompts
+  const journalBlock = lastSubmitted ? `\n\nJournal entry (verbatim):\n"""${lastSubmitted}"""`: "";
+
+  const tinyHabitPrefill = `Help me craft a 1-minute daily habit based on today’s journal. ` + `Suggest 1 tiny action and a supportive reminder.` + journalBlock;
+
+  const reflectPrefill = `What patterns or triggers should I watch for based on my recent journal? ` + `Offer 2 gentle suggestions.` + journalBlock;
+
 
   // Success message persists until dismissed by user
 
@@ -111,10 +119,11 @@ export default function JournalInterface({
 
     try {
       // Send raw content to our API which calls actions/entries.ts -> insertEntry
+      const entryText = content.trim(); // <-- NEW
       const res = await fetch("/api/entries", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ rawJournalText: content.trim() }),
+        body: JSON.stringify({ rawJournalText: entryText }),
       });
 
       const json = await res.json();
@@ -126,6 +135,8 @@ export default function JournalInterface({
           typeof json?.error === "string" ? json.error : "Failed to save entry"
         );
       }
+
+      setLastSubmitted(entryText);
 
       setSuccess(true);
       setContent("");
@@ -483,6 +494,7 @@ export default function JournalInterface({
               </div>
             )}
 
+
             {/* Success Message */}
             {success && (
               <div className="text-center py-6 sm:py-8 space-y-4 px-4">
@@ -515,28 +527,30 @@ export default function JournalInterface({
                 {/* CTAs to Chat with prefilled prompts */}
                 <div className="flex flex-col sm:flex-row gap-3 justify-center max-w-md mx-auto">
                   <Button asChild className="bg-teal-600 hover:bg-teal-700">
-                    <a
-                      href={`/chat?prefill=${encodeURIComponent(
-                        "Help me craft a 1-minute daily habit based on today’s journal. Suggest 1 tiny action and a supportive reminder."
-                      )}&autosend=1`}
+                    <Link
+                      href={{
+                        pathname: "/chat",
+                        query: { prefill: tinyHabitPrefill, autosend: "1" },
+                    }}
                       aria-label="Ask Alia for a tiny habit"
                     >
                       Ask Alia for a tiny habit
-                    </a>
+                    </Link>
                   </Button>
                   <Button
                     asChild
                     variant="outline"
                     className="border-amber-200 text-amber-800 hover:bg-amber-50"
                   >
-                    <a
-                      href={`/chat?prefill=${encodeURIComponent(
-                        "What patterns or triggers should I watch for based on my recent journal? Offer 2 gentle suggestions."
-                      )}`}
+                    <Link
+                      href={{
+                        pathname: "/chat",
+                        query: { prefill: reflectPrefill },
+                      }}
                       aria-label="Reflect with Alia"
                     >
                       Reflect with Alia
-                    </a>
+                    </Link>
                   </Button>
                 </div>
 
