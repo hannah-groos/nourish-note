@@ -29,7 +29,7 @@ export default function ChatModal() {
       if (!res.ok) throw new Error("Network error");
 
       const data = await res.json();
-      const botMessage = { role: "assistant", content: data.answer?.content || "No reply" };
+      const botMessage = { role: "assistant", content: data.answer || "No reply" };
       setMessages((prev) => [...prev, botMessage]);
     } catch (err) {
       console.error(err);
