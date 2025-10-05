@@ -175,7 +175,7 @@ export default function MoodEntry({ onStartConversation, onSelectEmotion, classN
               onClick={() => onStartConversation("What am I grateful for today?")}
               className="text-sm text-teal-700 hover:text-teal-900 hover:underline text-left w-full"
             >
-              • What am I grateful for today?
+              • What am I grateful for today (moments, feelings, etc)?
             </button>
           </li>
           <li>
@@ -183,7 +183,7 @@ export default function MoodEntry({ onStartConversation, onSelectEmotion, classN
               onClick={() => onStartConversation("How did my meals make me feel?")}
               className="text-sm text-teal-700 hover:text-teal-900 hover:underline text-left w-full"
             >
-              • How did my meals make me feel?
+              • How did my meals make me feel - physically and emotionally?
             </button>
           </li>
           <li>
@@ -191,7 +191,7 @@ export default function MoodEntry({ onStartConversation, onSelectEmotion, classN
               onClick={() => onStartConversation("What challenges did I face today?")}
               className="text-sm text-teal-700 hover:text-teal-900 hover:underline text-left w-full"
             >
-              • What challenges did I face today?
+              • What challenges did I face today? What have they brought up for me? What did I learn from them?
             </button>
           </li>
         </ul>
