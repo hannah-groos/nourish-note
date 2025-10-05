@@ -1,13 +1,13 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/supa_components/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@/components/supa_components/dropdown-menu";
 import { Laptop, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
@@ -25,12 +25,18 @@ const ThemeSwitcher = () => {
     return null;
   }
 
-  const ICON_SIZE = 16;
+  const ICON_SIZE = 20;
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size={"sm"}>
+        <Button
+          variant="ghost"
+          size={"default"}
+          aria-label="Toggle theme"
+          title="Toggle theme"
+          className="bg-transparent text-[var(--teal-700)] dark:text-[var(--teal-100)] border border-[color:rgb(45_212_191_/_0.35)] hover:border-[color:rgb(45_212_191_/_0.6)] hover:ring-2 hover:ring-[color:rgb(45_212_191_/_0.35)] rounded-md"
+        >
           {theme === "light" ? (
             <Sun
               key="light"
@@ -76,3 +82,4 @@ const ThemeSwitcher = () => {
 };
 
 export { ThemeSwitcher };
+

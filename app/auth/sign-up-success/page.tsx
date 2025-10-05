@@ -4,7 +4,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@/components/supa_components/card";
 
 export default function Page() {
   return (
@@ -16,7 +16,7 @@ export default function Page() {
               <CardTitle className="text-2xl">
                 Thank you for signing up!
               </CardTitle>
-              <CardDescription>Check your email to confirm</CardDescription>
+              <CardDescription>Check your email to confirm</CardDescription> 
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">

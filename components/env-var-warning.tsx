@@ -1,5 +1,5 @@
-import { Badge } from "./ui/badge";
-import { Button } from "./ui/button";
+import { Badge } from "./supa_components/badge";
+import { Button } from "./supa_components/button";
 
 export function EnvVarWarning() {
   return (
