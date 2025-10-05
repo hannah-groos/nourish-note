@@ -3,6 +3,8 @@ import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import Link from "next/link";
 import { ThemeSwitcher } from "@/components/theme-switcher";
+import TimezoneSelector from "@/components/ui/timezone-selector";
+import { LogoutButton } from "@/components/logout-button";
 import "./globals.css";
 
 const defaultUrl = process.env.VERCEL_URL
@@ -34,18 +36,22 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {/* Global Home button (routes to /) */}
-          <div className="fixed top-4 left-4 z-50">
-            <Link
-              href="/"
-              className="inline-flex items-center justify-center px-4 py-2 text-sm sm:text-base bg-transparent border border-[var(--teal-200)] dark:border-[var(--teal-800)] text-[var(--teal-900)] dark:text-[var(--teal-100)] font-medium rounded-lg shadow-sm hover:bg-[var(--teal-100)] dark:hover:bg-[var(--teal-900)] transition-colors"
-            >
-              Home
-            </Link>
-          </div>
-          {/* Global theme toggle */}
-          <div className="fixed top-4 right-4 z-50">
-            <ThemeSwitcher />
+          {/* Header: Brand + Timezone (left), Theme + Logout (right) */}
+          <div className="fixed inset-x-0 top-0 z-50 flex items-center justify-between px-4 py-3">
+            <div className="flex items-center gap-4">
+              <Link
+                href="/"
+                className="text-base sm:text-lg font-semibold text-[var(--teal-900)] dark:text-[var(--teal-100)] hover:text-[var(--teal-700)] dark:hover:text-[var(--teal-300)] transition-colors"
+                aria-label="NourishNote Home"
+              >
+                NourishNote
+              </Link>
+              <TimezoneSelector />
+            </div>
+            <div className="flex items-center gap-3">
+              <ThemeSwitcher />
+              <LogoutButton />
+            </div>
           </div>
           {children}
         </ThemeProvider>

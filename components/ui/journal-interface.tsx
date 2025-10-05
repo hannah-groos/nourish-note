@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Progress } from "@/components/ui/progress"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { Clock, Flame, BookOpen, MessageCircle, LogOut } from "lucide-react"
+import { Clock, Flame, BookOpen, MessageCircle, LogOut, UserCircle } from "lucide-react"
 
 interface JournalInterfaceProps {
     userId: string
@@ -19,9 +19,10 @@ interface JournalInterfaceProps {
         longest_streak: number
         total_entries: number
     } | null
+    cooldownHours?: number
 }
 
-export default function JournalInterface({ userId, userEmail, entriesRemaining, streakData }: JournalInterfaceProps) {
+export default function JournalInterface({ userId, userEmail, entriesRemaining, streakData, cooldownHours }: JournalInterfaceProps) {
     const [content, setContent] = useState("")
     const [timeLeft, setTimeLeft] = useState(60)
     const [isActive, setIsActive] = useState(false)
@@ -81,7 +82,8 @@ export default function JournalInterface({ userId, userEmail, entriesRemaining, 
         }
 
         if (entriesRemaining <= 0) {
-            setError("You've reached your limit of 2 entries per 24 hours")
+            const hours = typeof cooldownHours === "number" && cooldownHours > 0 ? cooldownHours : undefined
+            setError(hours ? `You've reached your limit of 2 entries per 24 hours. Please come back in ${hours} hour${hours === 1 ? "" : "s"}.` : "You've reached your limit of 2 entries per 24 hours")
             return
         }
 
@@ -111,8 +113,8 @@ export default function JournalInterface({ userId, userEmail, entriesRemaining, 
             setIsActive(false)
             setHasExtended(false)
 
-            // Optional: refresh later if needed; removed to avoid flicker
-            // router.refresh()
+            // Refresh to update streaks and counters immediately
+            router.refresh()
         } catch (err) {
             setError(err instanceof Error ? err.message : "Failed to save entry")
         } finally {
@@ -141,15 +143,15 @@ export default function JournalInterface({ userId, userEmail, entriesRemaining, 
         <div className="min-h-screen bg-gradient-to-br from-teal-50 via-white to-amber-50">
             {/* Header */}
             <header className="border-b border-teal-100 bg-white/80 backdrop-blur-sm">
-                <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+                <div className="container mx-auto pl-4 pr-6 py-4 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <h1 className="text-2xl font-bold text-teal-900">NourishNote</h1>
                     </div>
-                    <div className="flex items-center gap-4">
-                        <span className="text-sm text-teal-700">{userEmail}</span>
-                        <Button variant="ghost" size="sm" onClick={handleSignOut} className="text-teal-700 hover:text-teal-900">
-                            <LogOut className="h-4 w-4" />
+                    <div className="flex items-center gap-2">
+                        <Button variant="ghost" size="sm" onClick={handleSignOut} className="text-teal-700 hover:text-teal-900 px-1" aria-label="Profile (click to sign out)">
+                            <UserCircle className="h-5 w-5" />
                         </Button>
+                        <span className="text-sm text-teal-700">{userEmail}</span>
                     </div>
                 </div>
             </header>
@@ -227,7 +229,9 @@ export default function JournalInterface({ userId, userEmail, entriesRemaining, 
                                 </Button>
                                 {entriesRemaining <= 0 && (
                                     <p className="text-sm text-amber-700 mt-2">
-                                        You&apos;ve reached your daily limit. Come back tomorrow!
+                                        {typeof cooldownHours === "number" && cooldownHours > 0
+                                            ? `You\'ve reached your daily limit. Please come back in ${cooldownHours} hour${cooldownHours === 1 ? "" : "s"}.`
+                                            : `You\'ve reached your daily limit. Come back tomorrow!`}
                                     </p>
                                 )}
                             </div>
@@ -309,19 +313,43 @@ export default function JournalInterface({ userId, userEmail, entriesRemaining, 
 
                         {/* Success Message */}
                         {success && (
-                            <div className="text-center py-8 space-y-3">
-                                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-teal-100 mb-4">
-                                    <svg className="w-8 h-8 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div className="text-center py-8 space-y-4">
+                                {/* Celebration */}
+                                <div className="mx-auto w-20 h-20 rounded-full bg-gradient-to-br from-teal-100 to-amber-100 flex items-center justify-center shadow-sm">
+                                    <svg className="w-10 h-10 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                     </svg>
                                 </div>
-                                <p className="text-teal-900 font-semibold">Entry saved successfully!</p>
-                                <p className="text-sm text-teal-600 mt-2">Great job taking time for yourself today.</p>
+                                <div className="space-y-1">
+                                    <p className="text-teal-900 font-semibold text-lg">Nice work—entry saved!</p>
+                                    <p className="text-sm text-teal-700">Want to turn today’s reflection into a tiny habit with Alia?</p>
+                                </div>
+
+                                {/* CTAs to Chat with prefilled prompts */}
+                                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                                    <Button asChild className="bg-teal-600 hover:bg-teal-700">
+                                        <a
+                                            href={`/chat?prefill=${encodeURIComponent("Help me craft a 1-minute daily habit based on today’s journal. Suggest 1 tiny action and a supportive reminder.")}&autosend=1`}
+                                            aria-label="Ask Alia for a tiny habit"
+                                        >
+                                            Ask Alia for a tiny habit
+                                        </a>
+                                    </Button>
+                                    <Button asChild variant="outline" className="border-amber-200 text-amber-800 hover:bg-amber-50">
+                                        <a
+                                            href={`/chat?prefill=${encodeURIComponent("What patterns or triggers should I watch for based on my recent journal? Offer 2 gentle suggestions.")}`}
+                                            aria-label="Reflect with Alia"
+                                        >
+                                            Reflect with Alia
+                                        </a>
+                                    </Button>
+                                </div>
+
                                 <div className="pt-2">
                                     <Button
                                         onClick={() => setSuccess(false)}
-                                        variant="outline"
-                                        className="border-teal-200 text-teal-700 hover:bg-teal-50"
+                                        variant="ghost"
+                                        className="text-teal-700 hover:bg-teal-50"
                                     >
                                         Dismiss
                                     </Button>
