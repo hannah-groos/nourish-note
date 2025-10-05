@@ -7,6 +7,8 @@ import { useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import Link from "next/link";
 import { Sparkles, X, MessageSquarePlus } from "lucide-react";
+import conversationStore, { ThreadMsg } from '@/lib/conversation';
+import SavedConversation from '@/components/SavedConversation';
 
 type Msg = { role: "user" | "assistant"; content: string };
 
@@ -16,6 +18,25 @@ export default function ChatPage() {
     const [threadId, setThreadId] = useState<string>(""); // set after mount
     const [mounted, setMounted] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [saved, setSaved] = useState(false);
+    const [showSaved, setShowSaved] = useState(false);
+
+    // Save the current conversation thread to the shared conversation store
+    function handleSaveConversation() {
+        // store the messages both in the conversation store and also
+        // under a thread-specific key so other code can find it by threadId
+    conversationStore.saveConversation(msgs as ThreadMsg[]);
+        try {
+            if (typeof window !== 'undefined' && window.localStorage && threadId) {
+                window.localStorage.setItem(`chat.saved.${threadId}`, JSON.stringify(msgs));
+            }
+        } catch {
+            // ignore
+        }
+        setSaved(true);
+        // revert saved label after a short while
+        setTimeout(() => setSaved(false), 2000);
+    }
 
     // Acquire a stable threadId ONLY after mount to avoid hydration mismatch
     useEffect(() => {
@@ -232,13 +253,28 @@ export default function ChatPage() {
                                 Reset conversation
                             </button>
                             {/* End conversation button (no handler yet) */}
-                            <button
-                                className="ml-4 inline-flex items-center justify-center px-3 py-1 rounded-md text-xs font-medium text-white bg-teal-700 hover:bg-teal-800 shadow-sm transition"
-                                aria-label="Save conversation"
-                            >
-                                Save conversation
-                            </button>
+                            <div className="flex items-center gap-3">
+                                <button
+                                    onClick={handleSaveConversation}
+                                    className="inline-flex items-center justify-center px-3 py-1 rounded-md text-xs font-medium text-white bg-teal-700 hover:bg-teal-800 shadow-sm transition"
+                                    aria-label="Save conversation"
+                                >
+                                    {saved ? 'Saved' : 'Save conversation'}
+                                </button>
+
+                                <button
+                                    onClick={() => setShowSaved((s) => !s)}
+                                    className="inline-flex items-center justify-center px-3 py-1 rounded-md text-xs font-medium text-teal-700 bg-white border hover:bg-teal-50"
+                                >
+                                    {showSaved ? 'Hide saved' : 'View saved'}
+                                </button>
+                            </div>
                             <div className="text-xs text-gray-500 mt-1">thread: {mounted && threadId ? `${threadId.slice(0, 8)}…` : '—'}</div>
+                            {showSaved && (
+                                <div className="mt-3">
+                                    <SavedConversation threadId={threadId} />
+                                </div>
+                            )}
                         </div>
                                 </section>
 
