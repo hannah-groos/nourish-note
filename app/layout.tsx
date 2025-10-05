@@ -6,6 +6,7 @@ import { ThemeSwitcher } from "@/components/theme-switcher";
 import TimezoneSelector from "@/components/ui/timezone-selector";
 import { LogoutButton } from "@/components/logout-button";
 import "./globals.css";
+import Navbar from "@/components/NavBar";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -37,22 +38,8 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {/* Header: Brand + Timezone (left), Theme + Logout (right) */}
-          <div className="fixed inset-x-0 top-0 z-50 flex items-center justify-between px-4 py-3">
-            <div className="flex items-center gap-4">
-              <Link
-                href="/"
-                className="text-base sm:text-lg font-semibold text-[var(--teal-900)] dark:text-[var(--teal-100)] hover:text-[var(--teal-700)] dark:hover:text-[var(--teal-300)] transition-colors"
-                aria-label="NourishNote Home"
-              >
-                NourishNote
-              </Link>
-              <TimezoneSelector />
-            </div>
-            <div className="flex items-center gap-3">
-              <ThemeSwitcher />
-              <LogoutButton />
-            </div>
-          </div>
+          
+          <Navbar />
           {children}
         </ThemeProvider>
       </body>

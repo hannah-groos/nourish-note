@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import DashboardView from "@/components/ui/dashboard-view";
+import ChatModal from "@/components/ChatModal";
 
 export const dynamic = "force-dynamic";
 
@@ -93,6 +94,9 @@ export default async function PastEntriesPage() {
   const streakData = { current_streak, longest_streak, total_entries } as const;
 
   return (
+    <>
     <DashboardView userEmail={userEmail} entries={entries} streakData={streakData} />
+    <ChatModal />
+    </>
   );
 }
