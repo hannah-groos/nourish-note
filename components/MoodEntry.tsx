@@ -43,8 +43,8 @@ const DEFAULT_MOODS: Mood[] = [
     id: "stressed",
     label: "Stressed",
     emoji: "🌀",
-    colorFrom: "from-blue-500",
-    colorTo: "to-indigo-500",
+    colorFrom: "from-sky-100",
+    colorTo: "to-sky-200",
     supportiveText:
       "Thanks for sharing. When stress is high, slowing down to listen to your body can help you choose with care.",
     prompts: [
@@ -59,8 +59,8 @@ const DEFAULT_MOODS: Mood[] = [
     id: "sad",
     label: "Sad / Lonely",
     emoji: "💔",
-    colorFrom: "from-rose-500",
-    colorTo: "to-pink-500",
+    colorFrom: "from-rose-100",
+    colorTo: "to-rose-200",
     supportiveText:
       "I’m here with you. Sadness and loneliness deserve gentleness. Let’s find a caring next step.",
     prompts: [
@@ -75,8 +75,8 @@ const DEFAULT_MOODS: Mood[] = [
     id: "stuck",
     label: "Stuck in a Cycle",
     emoji: "🔄",
-    colorFrom: "from-amber-500",
-    colorTo: "to-orange-500",
+    colorFrom: "from-amber-100",
+    colorTo: "to-amber-200",
     supportiveText:
       "Feeling stuck is a sign of awareness, not failure. Let’s map the pattern together, gently.",
     prompts: [
@@ -91,8 +91,8 @@ const DEFAULT_MOODS: Mood[] = [
     id: "motivated",
     label: "Motivated",
     emoji: "☀️",
-    colorFrom: "from-emerald-500",
-    colorTo: "to-teal-500",
+    colorFrom: "from-emerald-100",
+    colorTo: "to-emerald-200",
     supportiveText:
       "Beautiful. Let’s channel that energy into small, sustainable steps that serve you.",
     prompts: [
@@ -107,8 +107,8 @@ const DEFAULT_MOODS: Mood[] = [
     id: "curious",
     label: "Curious",
     emoji: "🕊️",
-    colorFrom: "from-purple-500",
-    colorTo: "to-fuchsia-500",
+    colorFrom: "from-purple-100",
+    colorTo: "to-purple-200",
     supportiveText:
       "Curiosity is powerful. Let’s explore your inner signals and patterns with kindness.",
     prompts: [
@@ -123,8 +123,8 @@ const DEFAULT_MOODS: Mood[] = [
     id: "idk",
     label: "I’m not sure",
     emoji: "🌫️",
-    colorFrom: "from-zinc-500",
-    colorTo: "to-slate-500",
+    colorFrom: "from-zinc-100",
+    colorTo: "to-slate-200",
     supportiveText:
       "Not knowing is okay. We can start simple and see what emerges.",
     prompts: [
@@ -179,12 +179,12 @@ export default function MoodEntry({
             key={mood.id}
             onClick={() => handleSelect(mood.id)}
             className={[
-              "group relative overflow-hidden rounded-2xl p-4 text-left",
-              "bg-gradient-to-br text-white shadow-md focus:outline-none focus-visible:ring-2",
+              "group relative overflow-hidden rounded-2xl p-4 text-left transition",
+              "bg-gradient-to-br text-teal-900/95 shadow-sm focus:outline-none focus-visible:ring-2",
               "ring-offset-2 ring-offset-white/5",
               selected === mood.id
-                ? "ring-2 ring-black/10"
-                : "hover:shadow-lg",
+                ? "ring-1 ring-teal-200 bg-white/60"
+                : "hover:shadow rounded-2xl",
               mood.colorFrom,
               mood.colorTo,
             ].join(" ")}
@@ -197,7 +197,7 @@ export default function MoodEntry({
               </span>
               <div className="flex flex-col">
                 <span className="font-medium">{mood.label}</span>
-                <span className="text-xs/5 opacity-90">Tap to see ideas</span>
+                <span className="text-xs text-teal-700/80">Tap to see ideas</span>
               </div>
             </div>
           </button>
@@ -213,7 +213,7 @@ export default function MoodEntry({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.18 }}
-            className="rounded-2xl border bg-white/60 backdrop-blur p-4 sm:p-5 shadow-sm"
+            className="rounded-2xl border bg-white/70 backdrop-blur-sm p-4 sm:p-5 shadow-sm"
             aria-live="polite"
           >
             <div className="flex items-start gap-3">
@@ -247,16 +247,16 @@ function SuggestionRow({
   onUse,
 }: { text: string; onUse: () => void }) {
   return (
-    <div className="flex items-center justify-between gap-3 rounded-xl border bg-white px-3 py-2">
-      <p className="text-sm text-gray-800">{text}</p>
+    <div className="flex items-center justify-between gap-3 rounded-xl border border-gray-100 bg-white px-3 py-2 shadow-sm">
+      <p className="text-sm text-gray-700">{text}</p>
         <div className="flex items-center gap-2">
         <button
           onClick={onUse}
-          className="inline-flex items-center justify-center rounded-md border p-2 text-xs font-medium hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+          className="inline-flex items-center justify-center rounded-md border border-transparent p-2 text-xs font-medium bg-white hover:bg-teal-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-200"
           aria-label="Discuss with Alia"
           title="Discuss with Alia"
         >
-          <MessageSquarePlus className="h-4 w-4 text-teal-700" />
+          <MessageSquarePlus className="h-4 w-4 text-teal-600" />
         </button>
       </div>
     </div>
