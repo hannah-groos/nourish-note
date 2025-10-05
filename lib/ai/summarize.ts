@@ -61,5 +61,5 @@ export async function summarizeConversation(messages: Msg[]): Promise<string | n
   if (!maybeText) return null;
 
   // Add header to the summary
-  return `AI Summary of Conversation\n\n${maybeText}`;
+  return `${maybeText}`;
 }

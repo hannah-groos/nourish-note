@@ -7,7 +7,14 @@ import { useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Sparkles, X, MessageSquarePlus, Send, Menu, UserCircle } from "lucide-react";
+import {
+  Sparkles,
+  X,
+  MessageSquarePlus,
+  Send,
+  Menu,
+  UserCircle,
+} from "lucide-react";
 import conversationStore, { type ThreadMsg } from "@/lib/conversation";
 import SavedConversation from "@/components/SavedConversation";
 import { createClient } from "@/lib/supabase/client";
@@ -25,6 +32,7 @@ export default function ChatPage() {
   const [showSaved, setShowSaved] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userEmail, setUserEmail] = useState<string>("");
+  const [isDeveloper, setIsDeveloper] = useState(false);
   const router = useRouter();
 
   function handleSaveConversation() {
@@ -58,12 +66,33 @@ export default function ChatPage() {
     // Get user information
     const getUser = async () => {
       const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (user?.email) {
         setUserEmail(user.email);
       }
     };
     getUser();
+
+    // Check if user is a developer
+    const checkDeveloperMode = () => {
+      // Method 1: Check if in development environment
+      const isDev = process.env.NODE_ENV === "development";
+
+      // Method 2: Check for developer flag in localStorage (optional)
+      const devFlag =
+        typeof window !== "undefined" &&
+        localStorage.getItem("developer_mode") === "true";
+
+      // Method 3: Check for specific developer emails (optional)
+      // const devEmails = ['dev@example.com', 'admin@example.com'];
+      // const isDevEmail = devEmails.includes(userEmail);
+
+      setIsDeveloper(isDev || devFlag);
+    };
+
+    checkDeveloperMode();
   }, []);
 
   useEffect(() => {
@@ -279,7 +308,6 @@ export default function ChatPage() {
       </header>
 
       <div className="container mx-auto px-4 py-4 sm:py-6 lg:py-8 max-w-7xl">
-
         <div className="flex flex-col lg:flex-row gap-4 sm:gap-6">
           <section className="flex-1 font-sans">
             {!showMoodBox && (
@@ -309,8 +337,8 @@ export default function ChatPage() {
                     Welcome to Alia
                   </h3>
                   <p className="text-base text-teal-600 max-w-md leading-relaxed">
-                    I&apos;m here to support you on your journey. Pick a mood to get
-                    started, or just say hello!
+                    I&apos;m here to support you on your journey. Pick a mood to
+                    get started, or just say hello!
                   </p>
                 </div>
               )}
@@ -443,12 +471,14 @@ export default function ChatPage() {
                 {saved ? "✓ Saved!" : "Save Conversation"}
               </button>
 
-              <button
-                onClick={() => setShowSaved((s) => !s)}
-                className="inline-flex items-center justify-center px-5 py-2.5 rounded-xl text-sm font-bold text-teal-700 bg-white border-2 border-teal-200 hover:bg-teal-50 hover:border-teal-300 transition-all shadow-md hover:shadow-lg"
-              >
-                {showSaved ? "Hide Saved" : "View Saved"}
-              </button>
+              {isDeveloper && (
+                <button
+                  onClick={() => setShowSaved((s) => !s)}
+                  className="inline-flex items-center justify-center px-5 py-2.5 rounded-xl text-sm font-bold text-teal-700 bg-white border-2 border-teal-200 hover:bg-teal-50 hover:border-teal-300 transition-all shadow-md hover:shadow-lg"
+                >
+                  {showSaved ? "Hide Saved" : "View Saved"}
+                </button>
+              )}
 
               <div className="text-xs font-semibold text-teal-600 ml-auto bg-teal-50 px-3 py-1.5 rounded-lg">
                 Thread:{" "}
@@ -456,7 +486,7 @@ export default function ChatPage() {
               </div>
             </div>
 
-            {showSaved && (
+            {isDeveloper && showSaved && (
               <div className="mt-5 p-5 bg-white rounded-2xl border-2 border-teal-100 shadow-xl shadow-teal-100/50 animate-in fade-in slide-in-from-top-2 duration-500">
                 <SavedConversation threadId={threadId} />
               </div>
