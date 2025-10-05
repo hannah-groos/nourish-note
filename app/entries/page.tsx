@@ -1,7 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import DashboardView from "@/components/ui/dashboard-view";
-import ChatModal from "@/components/ChatModal";
+import EntriesChatSplit from "@/components/ui/entries-chat-split";
 
 export const dynamic = "force-dynamic";
 
@@ -12,6 +11,7 @@ export default async function PastEntriesPage() {
   if (!user) redirect("/auth/login");
 
   const userEmail = user.email ?? "";
+  const userId = user.id;
 
   // Fetch user's entries
   const { data: rows, error } = await supabase
@@ -93,10 +93,16 @@ export default async function PastEntriesPage() {
 
   const streakData = { current_streak, longest_streak, total_entries } as const;
 
+  // Fetch initial chat messages (empty for now, but could be extended)
+  const initialMessages: unknown[] = [];
+
   return (
-    <>
-    <DashboardView userEmail={userEmail} entries={entries} streakData={streakData} />
-    <ChatModal />
-    </>
+    <EntriesChatSplit 
+      userEmail={userEmail}
+      userId={userId}
+      entries={entries}
+      streakData={streakData}
+      initialMessages={initialMessages}
+    />
   );
 }
